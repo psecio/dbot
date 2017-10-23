@@ -15,6 +15,7 @@ class State
         10 => 'Hello',
         11 => 'Heartbeatack'
     ];
+    protected $dispatch = [];
 
     protected $status = self::STATUS_DISCONNECTED;
 
@@ -84,5 +85,25 @@ class State
     public function isAuthed()
     {
         return ($this->status == self::STATUS_AUTHED);
+    }
+
+    public function addDispatch($dispatch)
+    {
+        $this->dispatch = $dispatch;
+    }
+
+    public function dispatch($type, $json)
+    {
+        if (!array_key_exists($type, $this->dispatch)) {
+            return null;
+        }
+        $dis = $this->dispatch[$type];
+
+        if ($dis instanceof \Closure) {
+            return $dis($json);
+        } elseif (is_callable($dis)) {
+            $obj = $dis[0];
+            return $obj->$dis[1]($json);
+        }
     }
 }
