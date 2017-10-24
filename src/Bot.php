@@ -6,10 +6,30 @@ use Psecio\DBot\State;
 
 class Bot
 {
+    /**
+     * Default WSS URL (from the Discord API docs)
+     * @var string
+     */
     protected $wssUrl = 'wss://gateway.discord.gg/?v=6&encoding=json';
+
+    /**
+     * Current bot token
+     * @var string
+     */
     protected $token;
+
+    /**
+     * Current set of dispatch handlers
+     * @var [type]
+     */
     protected $dispatch = [];
 
+    /**
+     * Init the bot and set the token and, optionally, the WSS URL
+     *
+     * @param string $botToken Current bot token
+     * @param string $wssUrl WSS URL [optional]
+     */
     public function __construct($botToken, $wssUrl = null)
     {
         if ($wssUrl !== null) {
@@ -18,11 +38,20 @@ class Bot
         $this->token = $botToken;
     }
 
+    /**
+     * Add a new dispatch handler
+     *
+     * @param string $type Dispatch type
+     * @param string|Callable $callback Callback to execute when dispatching action
+     */
     public function addDispatch($type, $callback)
     {
         $this->dispatch[$type] = $callback;
     }
 
+    /**
+     * Init the bot and set up the loop/actions for the WebSocket
+     */
     public function init()
     {
         $loop = \React\EventLoop\Factory::create();
